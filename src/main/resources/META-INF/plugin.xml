@@ -47,6 +47,7 @@
             <keyboard-shortcut first-keystroke="control shift Y" keymap="$default"/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
             <add-to-group group-id="tasks.toolbar.group" anchor="last"/>
+            <add-to-group group-id="tasks.toolbar.group" anchor="last"/>
         </action>
 
         <action id="com.github.jk1.ytplugin.issues.actions.CreateIssueAction"
@@ -72,6 +73,9 @@
             <implementation-class>com.github.jk1.ytplugin.tasks.TaskManagerProxyComponent</implementation-class>
         </component>
         <component>
+            <implementation-class>com.github.jk1.ytplugin.setupWindow.SetupManagerProxyComponent</implementation-class>
+        </component>
+        <component>
             <implementation-class>com.github.jk1.ytplugin.editor.AdminComponent</implementation-class>
         </component>
         <component>
@@ -87,6 +91,7 @@
             <interface-class>com.github.jk1.ytplugin.YouTrackPluginApi</interface-class>
             <implementation-class>com.github.jk1.ytplugin.YouTrackPluginApiComponent</implementation-class>
         </component>
+
     </project-components>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -102,7 +107,7 @@
 <!--                    factoryClass="com.github.jk1.ytplugin.issues.IssuesToolWindowFactory" canCloseContents="true"/>-->
         <toolWindow id="You Track" anchor="bottom" icon="/icons/logo-setup-resized.png"
                     factoryClass="com.github.jk1.ytplugin.setupWindow.SetUpDialogFactory" canCloseContents="true"/>
-        <search.optionContributor implementation="com.github.jk1.ytplugin.setupWindow.Config.TaskSearchableOptionContributor"/>
+        <search.optionContributor implementation="com.github.jk1.ytplugin.setupWindow.Conf.TaskSearchableOptionContributor"/>
 
 
     </extensions>

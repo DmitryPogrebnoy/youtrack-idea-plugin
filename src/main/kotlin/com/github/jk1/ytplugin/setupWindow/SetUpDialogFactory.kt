@@ -35,7 +35,7 @@ class SetUpDialogFactory : ToolWindowFactory {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         createContent(project, toolWindow)
         // listen to task management plugin configuration changes and update tool window accordingly
-        ComponentAware.of(project).taskManagerComponent.addConfigurationChangeListener {
+        ComponentAware.of(project).setupManagerComponent.addConfigurationChangeListener {
             SwingUtilities.invokeLater {
                 logger.debug("Server configuration change detected, reloading tool window contents")
                 createContent(project, toolWindow)
@@ -62,7 +62,7 @@ class SetUpDialogFactory : ToolWindowFactory {
     private fun createContent(project: Project, toolWindow: ToolWindow) {
         val contentManager = toolWindow.contentManager
         contentManager.removeAllContents(true)
-        val repos = ComponentAware.of(project).taskManagerComponent.getAllConfiguredYouTrackRepositories()
+        val repos = ComponentAware.of(project).setupManagerComponent.getAllConfiguredYouTrackRepositories()
         logger.debug("${repos.size} YouTrack repositories discovered")
         when {
             repos.isEmpty() -> contentManager.addContent("", createPlaceholderPanel(project))

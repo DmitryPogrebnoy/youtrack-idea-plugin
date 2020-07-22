@@ -7,6 +7,7 @@ import com.github.jk1.ytplugin.issues.PersistentIssueStoreComponent
 import com.github.jk1.ytplugin.issues.actions.ToggleIssueViewAction
 import com.github.jk1.ytplugin.navigator.SourceNavigatorComponent
 import com.github.jk1.ytplugin.notifications.NotificationsComponent
+import com.github.jk1.ytplugin.setupWindow.SetupManagerProxyComponent
 import com.github.jk1.ytplugin.tasks.TaskManagerProxyComponent
 import com.github.jk1.ytplugin.ui.SetupList
 import com.intellij.openapi.application.ApplicationManager
@@ -32,6 +33,9 @@ interface ComponentAware {
 
     val taskManagerComponent: TaskManagerProxyComponent
         get() = project.getComponent(TaskManagerProxyComponent::class.java)!!
+
+    val setupManagerComponent: SetupManagerProxyComponent
+        get() = project.getComponent(SetupManagerProxyComponent::class.java)!!
 
     val commandComponent: CommandComponent
         get() = project.getComponent(CommandComponent::class.java)!!

@@ -12,14 +12,13 @@ import com.intellij.tasks.youtrack.YouTrackRepositoryType
 import com.intellij.util.Function
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.net.HttpConfigurable
-import com.jetbrains.rd.swing.textProperty
+import org.jetbrains.annotations.Contract
 import java.awt.Color
 import java.awt.Dialog
 import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.event.ActionListener
 import java.awt.event.KeyEvent
-import java.awt.event.WindowEvent
 import javax.swing.*
 import javax.swing.text.AttributeSet
 import javax.swing.text.SimpleAttributeSet
@@ -31,6 +30,8 @@ import javax.swing.text.StyleContext
  * @author Akina Boshchenko
  */
 class SetupWindow(val project: Project) : ProjectComponent {
+
+//    private lateinit var myManager: SetupManagerImpl
 
     private lateinit var tabFrame: JFrame
     private lateinit var tab2Frame: JFrame
@@ -59,24 +60,42 @@ class SetupWindow(val project: Project) : ProjectComponent {
     private var testConnectButton = JButton("Test connection")
     private var proxySettingsButton = JButton("Proxy settings...")
     private var inputUrl = JTextPane()
-
     private var inputToken = JPasswordField("")
-
 
     init {
         prepareDialogWindow()
     }
 
+
+//
     fun showIssues(repository: YouTrackRepository) {
-        val myManager: TaskManagerImpl = TaskManager.getManager(project) as TaskManagerImpl
-        lateinit var myRepositories: List<YouTrackRepository>
+        val myManager: SetupManagerImpl = SetupManager.getManager(project) as SetupManagerImpl
+        System.out.println(myManager.state)
+        System.out.println(myManager.getActiveTask())
+
+        var myRepositories: List<YouTrackRepository>
         myRepositories = ArrayList()
         myRepositories.add(repository)
-        val newRepositories: List<TaskRepository> = ContainerUtil.map<TaskRepository, TaskRepository>(myRepositories, Function { obj: TaskRepository -> obj.clone() })
+        val newRepositories: List<YouTrackRepository> = ContainerUtil.map<YouTrackRepository, YouTrackRepository>(myRepositories, Function { obj: YouTrackRepository -> obj.clone() as YouTrackRepository })
         myManager.setRepositories(newRepositories)
+        for (r in newRepositories)
+            System.out.println(r.isConfigured)
         myManager.updateIssues(null)
         RecentTaskRepositories.getInstance().addRepositories(myRepositories)
     }
+
+//    fun showIssues(repository: YouTrackRepository) {
+//        val myManager: TaskManagerImpl = TaskManager.getManager(project) as TaskManagerImpl
+//        lateinit var myRepositories: List<YouTrackRepository>
+//        myRepositories = ArrayList()
+//        myRepositories.add(repository)
+//        val newRepositories: List<TaskRepository> = ContainerUtil.map<TaskRepository, TaskRepository>(myRepositories, Function { obj: TaskRepository -> obj.clone() })
+//        myManager.setRepositories(newRepositories)
+//        for (r in newRepositories)
+//            System.out.println(r.isConfigured)
+//        myManager.updateIssues(null)
+//        RecentTaskRepositories.getInstance().addRepositories(myRepositories)
+//    }
 
     fun loginAnonymouslyChanged(enabled: Boolean) {
         inputToken.setEnabled(enabled)
@@ -87,7 +106,6 @@ class SetupWindow(val project: Project) : ProjectComponent {
     fun testConnectionAction() {
         val setup = SetupTask()
         setup.correctUrl = inputUrl.text
-
 
         val myRepository = YouTrackRepository()
         val myRepositoryType = YouTrackRepositoryType()
@@ -105,12 +123,11 @@ class SetupWindow(val project: Project) : ProjectComponent {
 
 
         if (!setup.isValidToken(myRepository.password)){
-            notifyField.apply {
-                text = "Invalid token"
-            }
+            notifyField.text = "Invalid token"
         }
         else {
             setup.testConnection(myRepository, project, notifyField)
+            showIssues(myRepository)
         }
 
         val oldUrl = inputUrl.text
@@ -118,7 +135,8 @@ class SetupWindow(val project: Project) : ProjectComponent {
 
         if (oldUrl == setup.correctUrl) {
             inputUrl.text = oldUrl
-        } else {
+        }
+        else {
             if (!oldUrl.contains("com/youtrack") && setup.correctUrl.contains("com/youtrack")) {
                 inputUrl.text = oldUrl
                 appendToPane(inputUrl, "/youtrack", Color.GREEN)
@@ -126,11 +144,11 @@ class SetupWindow(val project: Project) : ProjectComponent {
             if (!oldUrl.contains("https") && oldUrl.contains("http") && setup.correctUrl.contains("https")) {
                 appendToPane(inputUrl, "https", Color.GREEN)
                 appendToPane(inputUrl, oldUrl.substring(4, oldUrl.length), inputToken.foreground)
-            } else {
+            }
+            else {
                 inputUrl.text = setup.correctUrl
             }
         }
-        showIssues(myRepository)
     }
 
 
@@ -180,8 +198,10 @@ private fun prepareDialogWindow() {
     useProxy = JCheckBox("Use Proxy", false)
     useProxy.setBounds(20, 100, 100, 17)
 
-    proxyDescription = JLabel("You can configure the HTTP Proxy to:")
-    proxyDescription.setBounds(220, 20, 370, 20)
+    proxyDescription = JLabel("<html>You can configure the HTTP Proxy to<br>Lorem ipsum dolor sit " +
+            "<br>sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</html>")
+
+    proxyDescription.setBounds(200, 10, 340, 120)
 
 
     proxySettingsButton.addActionListener(ActionListener {
@@ -196,7 +216,6 @@ private fun prepareDialogWindow() {
 
     okButton.addActionListener {
         testConnectionAction()
-//            mainFrame.isVisible = false
         mainFrame.dispose()
     }
 
@@ -260,7 +279,6 @@ private fun prepareDialogWindow() {
     val screenSize: Dimension = toolkit.getScreenSize()
 
     mainFrame.apply {
-//            dispatchEvent(WindowEvent(mainFrame, WindowEvent.WINDOW_CLOSING))
         modalityType = Dialog.ModalityType.APPLICATION_MODAL
         add(okPanel)
         add(cancelPanel)
@@ -271,8 +289,5 @@ private fun prepareDialogWindow() {
         setLocation((screenSize.width - width) / 2, (screenSize.height - height) / 2)
         isVisible = true;
     }
-
-
 }
-
 }
